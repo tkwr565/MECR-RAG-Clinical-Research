@@ -1,0 +1,254 @@
+# MECR-RAG Clinical Research Repository - Academic Git Ignore
+
+# ============================================================================
+# SECURITY - NEVER COMMIT THESE!
+# ============================================================================
+.env
+.env.*
+!.env.template
+*.key
+*.pem
+api_keys.txt
+secrets/
+config/secrets/
+
+# ============================================================================
+# PYTHON
+# ============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ============================================================================
+# VIRTUAL ENVIRONMENTS
+# ============================================================================
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ============================================================================
+# LOGS
+# ============================================================================
+logs/
+*.log
+log/
+
+# ============================================================================
+# TEMPORARY FILES
+# ============================================================================
+.tmp/
+tmp/
+temp/
+.temp/
+*.tmp
+*.bak
+*~
+
+# ============================================================================
+# IDE/EDITOR
+# ============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============================================================================
+# OS
+# ============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ============================================================================
+# JUPYTER NOTEBOOKS
+# ============================================================================
+.ipynb_checkpoints
+notebooks/output/
+notebooks/.ipynb_checkpoints
+*/.ipynb_checkpoints/
+
+# ============================================================================
+# MEDICAL DATA - PRIVACY PROTECTION (NEVER COMMIT!)
+# ============================================================================
+
+# Raw medical case data (excluded from repository)
+data/past_case/
+data/test_case/
+
+# Vector databases containing medical cases (excluded from repository)
+db/past_case/
+
+# Any medical record files
+**/medical_records/
+**/patient_data/
+**/clinical_cases/
+**/hospital_data/
+**/emergency_dept_data/
+**/phi_data/
+**/identifiable/
+
+# ============================================================================
+# RESEARCH OUTPUTS - POTENTIALLY SENSITIVE
+# ============================================================================
+
+# Evaluation outputs that may contain sensitive patterns
+evaluation_outputs/
+results/
+outputs/
+
+# Model prediction outputs
+*_results.json
+*_output.json
+*_evaluation.json
+*_predictions.json
+
+# Statistical analysis outputs with potential sensitive data
+statistical_analysis/results/
+statistical_analysis/raw_data/
+
+# Experimental temporary files
+experiments/temp/
+experiments/cache/
+experiments/intermediate/
+experiments/outputs/
+*.experiment.log
+*.exp.json
+
+# ============================================================================
+# RESEARCH DATA PROTECTION
+# ============================================================================
+
+# Ground truth and consensus data (sensitive)
+**/ground_truth/
+**/consensus_labels/
+**/expert_ratings/
+**/clinical_assessments/
+**/validation_cases/
+
+# Large datasets that may contain sensitive information
+**/large_datasets/
+**/datasets/medical/
+**/clinical_data/
+**/triage_data/
+
+# Model outputs and embeddings (may contain sensitive patterns)
+**/model_outputs/
+**/prediction_outputs/
+**/embeddings_cache/
+**/vector_embeddings/
+
+# ============================================================================
+# PYTEST & TESTING
+# ============================================================================
+.pytest_cache/
+.coverage
+htmlcov/
+tests/temp/
+tests/output/
+*.test.json
+*.test.csv
+
+# ============================================================================
+# STATISTICAL SOFTWARE
+# ============================================================================
+.Rhistory
+.RData
+.Ruserdata
+*.rds
+*.sav
+*.por
+*.sas7bdat
+*.dta
+*.spv
+*.spo
+
+# ============================================================================
+# ACADEMIC WRITING & PUBLICATION
+# ============================================================================
+
+# LaTeX temporary files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.out
+*.log
+
+# Manuscript drafts (if any)
+manuscript/drafts/
+publication/drafts/
+*.draft
+*.backup
+
+# ============================================================================
+# COMPUTATIONAL RESOURCES
+# ============================================================================
+
+# Job scheduler files
+*.pbs
+*.slurm
+*.job
+
+# Performance and profiling
+**/profiling_results/
+**/benchmark_temp/
+**/performance_logs/
+
+# ============================================================================
+# DOCUMENTATION BUILDS
+# ============================================================================
+
+# Sphinx documentation builds
+docs/_build/
+docs/build/
+
+# MkDocs builds
+site/
+
+# ============================================================================
+# BACKUP AND SYNC
+# ============================================================================
+*.backup
+.sync/
+.rsync_temp/
+.backup_temp/
+**/autosave/
+**/.autosave/
+
+# ============================================================================
+# LOCAL DEVELOPMENT
+# ============================================================================
+*.local
+.env.local
+.env.development.local
+.env.test.local
