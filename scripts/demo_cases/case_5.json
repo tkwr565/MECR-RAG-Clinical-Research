@@ -1,0 +1,44 @@
+{
+    "Demographics": {
+        "Sex": "M",
+        "Age": "44 years",
+        "Ambulatory status": "Ambulant",
+        "Risk of fall": "No",
+        "Informant": "Self",
+        "Communication": "--",
+        "Allergies": "--",
+        "ADR": "",
+        "Alerts": "",
+        "Past health": "",
+        "TOCC": "",
+        "Referral (if any)": "No"
+    },
+    "Clinical Presentation": {
+        "Chief complaint": "IOD 3/12 ago\nno discomfort\nfor extend SL",
+        "Condition on Arrival": "well"
+    },
+    "Vitals and Observations": {
+        "Vital Signs": {
+            "GCS": "E: 4, V: 5, M: 6, Score: 15/15",
+            "BP": "1st: 130/77 mmHg",
+            "PR/AR": "70",
+            "Temp": "36.8",
+            "SpO2": "99% on room air, --",
+            "RR": "--",
+            "PFR": "--",
+            "Limbs": "--",
+            "Pupil": "--"
+        },
+        "Triage Intervention": {
+            "H'stix": "",
+            "H'cue": ""
+        }
+    },
+    "Case Disposition": {
+        "Triage Category": "5",
+        "Diagnosis": "Normal Findings",
+        "Attending Specialty": "Orthopedics",
+        "Trauma Type": "Non-traumatic",
+        "Discharge Destination": "Home + medication"
+    }
+}

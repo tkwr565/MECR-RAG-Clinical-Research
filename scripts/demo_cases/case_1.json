@@ -1,0 +1,44 @@
+{
+    "Demographics": {
+        "Sex": "M",
+        "Age": "42 years",
+        "Ambulatory status": "Stretcher",
+        "Risk of fall": "--",
+        "Informant": "Paramedic",
+        "Communication": "--",
+        "Allergies": "(1)No Known Drug Allergy",
+        "ADR": "",
+        "Alerts": "",
+        "Past health": "GPH",
+        "TOCC": "",
+        "Referral (if any)": "Ambulance"
+    },
+    "Clinical Presentation": {
+        "Chief complaint": "MVA high speed impact\nunconsious at scene\nGCS 3 initially\nimproved to GCS 8 in ambulance\nno obvious external bleeding\nSOB+",
+        "Condition on Arrival": "GCS 8/15\nrespiratory distress\nmultiple abrasions\npossible internal injuries\ntachycardic and hypotensive"
+    },
+    "Vitals and Observations": {
+        "Vital Signs": {
+            "GCS": "E: 2, V: 2, M: 4, Score: 8/15",
+            "BP": "1st: 85/45 mmHg",
+            "PR/AR": "125",
+            "Temp": "35.8",
+            "SpO2": "88% on 15L O2, bag mask ventilation",
+            "RR": "28",
+            "PFR": "--",
+            "Limbs": "multiple abrasions bilateral",
+            "Pupil": "Right: 4mm sluggish | Left: 3mm reactive"
+        },
+        "Triage Intervention": {
+            "H'stix": "",
+            "H'cue": ""
+        }
+    },
+    "Case Disposition": {
+        "Triage Category": "1",
+        "Diagnosis": "Head injury\nShock",
+        "Attending Specialty": "Neurosurgery",
+        "Trauma Type": "Traumatic",
+        "Discharge Destination": "Admit PMH, Neurosurgery"
+    }
+}

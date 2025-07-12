@@ -1,0 +1,44 @@
+{
+    "Demographics": {
+        "Sex": "M",
+        "Age": "67 years",
+        "Ambulatory status": "Wheelchair",
+        "Risk of fall": "Yes",
+        "Informant": "Self",
+        "Communication": "--",
+        "Allergies": "(1)No Known Drug Allergy",
+        "ADR": "",
+        "Alerts": "(1)On Anti-coagulant; (2)Diabetic",
+        "Past health": "DM type 2\nIHD s/p CABG 2019\nHTN\nDyslipidaemia",
+        "TOCC": "No",
+        "Referral (if any)": "GP referral"
+    },
+    "Clinical Presentation": {
+        "Chief complaint": "chest pain x 2hrs\ncentral crushing pain 8/10\nradiation to L arm and jaw\nsweating+\nSOB+\nno nausea/vomitting",
+        "Condition on Arrival": "pale and diaphoretic\nconscious and alert\nSOB on exertion"
+    },
+    "Vitals and Observations": {
+        "Vital Signs": {
+            "GCS": "E: 4, V: 5, M: 6, Score: 15/15",
+            "BP": "1st: 170/95 mmHg",
+            "PR/AR": "102",
+            "Temp": "36.8",
+            "SpO2": "94% on room air, 98% on 2L O2",
+            "RR": "22",
+            "PFR": "--",
+            "Limbs": "--",
+            "Pupil": "Right: 3mm Reactive to light | Left: 3mm Reactive to light"
+        },
+        "Triage Intervention": {
+            "H'stix": "8.2 mmol/L",
+            "H'cue": ""
+        }
+    },
+    "Case Disposition": {
+        "Triage Category": "2",
+        "Diagnosis": "Acute coronary syndrome\nChest pain",
+        "Attending Specialty": "Medicine",
+        "Trauma Type": "Non-traumatic",
+        "Discharge Destination": "Admit CCU"
+    }
+}

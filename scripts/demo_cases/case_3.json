@@ -1,0 +1,45 @@
+{
+    "Demographics": {
+        "Sex": "F",
+        "Age": "55 years",
+        "Ambulatory status": "Stretcher",
+        "Risk of fall": "--",
+        "Informant": "Relative",
+        "Communication": "--",
+        "Allergies": "(1)No Known Drug Allergy",
+        "ADR": "",
+        "Alerts": "(1)On Warfarin",
+        "Past health": "AF on warfarin\nHTN\nDM type 2",
+        "TOCC": "No",
+        "Referral (if any)": "Ambulance"
+    },
+    "Clinical Presentation": {
+        "Chief complaint": "RUQ pain today\nradiation to back\nvomitting x 3 episodes\nno diarrhoea\nno fever",
+        "Condition on Arrival": "RUQ tenderness+"
+    },
+    "Vitals and Observations": {
+        "Vital Signs": {
+            "GCS": "E: 4, V: 5, M: 6, Score: 15/15",
+            "BP": "1st: 140/88 mmHg",
+            "PR/AR": "95",
+            "Temp": "37.2",
+            "SpO2": "98% on room air, --",
+            "RR": "18",
+            "PFR": "--",
+            "Limbs": "--",
+            "Pupil": "Right: 3mm Reactive to light | Left: 3mm Reactive to light"
+        },
+        "Triage Intervention": {
+            "H'stix": "9.8 mmol/L",
+            "H'cue": ""
+        },
+        "Menstruation / Pregnancy Status": "post-menopausal"
+    },
+    "Case Disposition": {
+        "Triage Category": "3",
+        "Diagnosis": "?biliary colic\nAbdominal pain",
+        "Attending Specialty": "Surgery",
+        "Trauma Type": "Non-traumatic",
+        "Discharge Destination": "Admit PMH, Surgery"
+    }
+}
