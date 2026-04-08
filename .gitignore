@@ -103,7 +103,7 @@ data/past_case/
 data/test_case/
 
 # Vector databases containing medical cases (excluded from repository)
-db/past_case/
+db/
 
 # Any medical record files
 **/medical_records/
