@@ -38,6 +38,7 @@ class GraphState(dict):
         self.setdefault("case_json_full", {})
         self.setdefault("guideline_section_metadata", [])
         self.setdefault("selected_guideline_sections", None)
+        self.setdefault("guideline_reasoning", None)  # New: reasoning for guideline selection
         self.setdefault("retrieved_guideline_content", None)
         self.setdefault("specialty_list", [])
         self.setdefault("selected_attending_specialty", None)
@@ -45,6 +46,12 @@ class GraphState(dict):
         self.setdefault("retrieved_cases_content", [])
         self.setdefault("past_cases_context", "")
         self.setdefault("final_assessment", None)
+        self.setdefault("final_category", None)  # New: extracted final category
+        self.setdefault("final_confidence", None)  # New: extracted final confidence
+        # Fields for error handling
+        self.setdefault("processing_failed", False)
+        self.setdefault("failure_reason", "")
+        self.setdefault("failed_node", "")
 
     # Type-safe property accessors
     @property
@@ -147,13 +154,40 @@ class GraphState(dict):
         self["past_cases_context"] = value
 
     @property
-    def final_assessment(self) -> Optional[str]:
-        """Final triage assessment."""
+    def final_assessment(self) -> Optional[Dict[str, Any]]:
+        """Final triage assessment (structured output dict or legacy string)."""
         return self.get("final_assessment")
 
     @final_assessment.setter
-    def final_assessment(self, value: Optional[str]):
+    def final_assessment(self, value: Optional[Dict[str, Any]]):
         self["final_assessment"] = value
+
+    @property
+    def guideline_reasoning(self) -> Optional[str]:
+        """Reasoning for guideline section selection."""
+        return self.get("guideline_reasoning")
+
+    @guideline_reasoning.setter
+    def guideline_reasoning(self, value: Optional[str]):
+        self["guideline_reasoning"] = value
+
+    @property
+    def final_category(self) -> Optional[str]:
+        """Extracted final triage category."""
+        return self.get("final_category")
+
+    @final_category.setter
+    def final_category(self, value: Optional[str]):
+        self["final_category"] = value
+
+    @property
+    def final_confidence(self) -> Optional[str]:
+        """Extracted final confidence level."""
+        return self.get("final_confidence")
+
+    @final_confidence.setter
+    def final_confidence(self, value: Optional[str]):
+        self["final_confidence"] = value
 
     def get_summary(self) -> Dict[str, Any]:
         """

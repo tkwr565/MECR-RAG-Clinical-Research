@@ -71,6 +71,7 @@ temp/
 # ============================================================================
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 *~
@@ -90,19 +91,23 @@ Thumbs.db
 # JUPYTER NOTEBOOKS
 # ============================================================================
 .ipynb_checkpoints
-notebooks/output/
-notebooks/.ipynb_checkpoints
 */.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+notebooks/output/
+notebooks/**/output/
 
 # ============================================================================
-# MEDICAL DATA - PRIVACY PROTECTION (NEVER COMMIT!)
+# MEDICAL DATA & RESTRICTED CONTENT - NEVER COMMIT!
 # ============================================================================
 
-# Raw medical case data (excluded from repository)
+# Raw medical case data (excluded from repository - privacy)
 data/past_case/
 data/test_case/
 
-# Vector databases containing medical cases (excluded from repository)
+# Source guideline text (excluded from repository - redistribution restricted)
+data/guidelines/
+
+# Vector databases and processed knowledge bases (excluded from repository)
 db/
 
 # Any medical record files

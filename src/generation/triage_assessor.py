@@ -5,11 +5,12 @@ This module handles the final triage category prediction and reasoning
 using integrated information from guidelines and past cases.
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Union
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from ..data.state import GraphState
+from ..models.schemas import TriagePredictionOutput
 from ..retrieval.guideline_retriever import format_guideline_content_for_prompt
 from ..retrieval.case_retriever import format_past_cases_context
 
@@ -136,9 +137,9 @@ def prepare_case_summary_for_assessment(state: GraphState) -> str:
 
 def generate_triage_assessment(
     case_summary: str, guideline_content: str, past_cases_context: str, llm
-) -> str:
+) -> Union[Dict[str, Any], str]:
     """
-    Generate a comprehensive triage assessment using the 3-step approach.
+    Generate a comprehensive triage assessment using the 3-step approach with structured output.
 
     Args:
         case_summary: Formatted case summary
@@ -147,7 +148,7 @@ def generate_triage_assessment(
         llm: Language model for assessment generation
 
     Returns:
-        Complete triage assessment string
+        Structured triage assessment dict or string (fallback)
     """
     # Create the prompt
     prompt = create_triage_assessment_prompt()
@@ -159,23 +160,32 @@ def generate_triage_assessment(
         "past_cases_context": past_cases_context,
     }
 
-    # Get LLM response
-    chain = prompt | llm | StrOutputParser()
-    response = chain.invoke(input_values)
+    try:
+        # Use structured output for machine-readable results
+        structured_llm = llm.with_structured_output(TriagePredictionOutput)
+        chain = prompt | structured_llm
+        response = chain.invoke(input_values)
 
-    return response
+        # Convert to dict for state storage
+        return response.model_dump()
+    except Exception as e:
+        print(f"Structured output failed, falling back to string output: {e}")
+        # Fallback to string output if structured fails
+        chain = prompt | llm | StrOutputParser()
+        response = chain.invoke(input_values)
+        return response
 
 
 def simplified_triage_prediction(state: GraphState, llm) -> GraphState:
     """
-    Simplified 3-step triage prediction focusing on key decision factors (GraphState node function).
+    Simplified 3-step triage prediction with structured output (GraphState node function).
 
     Args:
         state: Current GraphState with all retrieved information
         llm: Language model for assessment generation
 
     Returns:
-        Updated state with final_assessment
+        Updated state with final_assessment, final_category, and final_confidence
     """
     # Handle both dict and GraphState objects
     if isinstance(state, dict):
@@ -194,7 +204,7 @@ def simplified_triage_prediction(state: GraphState, llm) -> GraphState:
     # Prepare past cases context
     past_cases_context = format_past_cases_context(retrieved_cases_content)
 
-    # Generate assessment
+    # Generate assessment (returns dict or string)
     assessment = generate_triage_assessment(
         case_summary=case_summary,
         guideline_content=guideline_content,
@@ -202,27 +212,44 @@ def simplified_triage_prediction(state: GraphState, llm) -> GraphState:
         llm=llm,
     )
 
-    print("======== SIMPLIFIED TRIAGE ASSESSMENT ========")
-    print(assessment)
+    print("======== STRUCTURED TRIAGE ASSESSMENT ========")
+    if isinstance(assessment, dict):
+        print(f"Step 1 (Clinical Risk): Category {assessment.get('step1_clinical_risk', {}).get('category', 'N/A')}")
+        print(f"Step 2 (Guidelines): Category {assessment.get('step2_guidelines', {}).get('category', 'N/A')}")
+        print(f"Step 3 (Real-world): Category {assessment.get('step3_realworld_factors', {}).get('category', 'N/A')}")
+        print(f"Final Decision: Category {assessment.get('final_decision', {}).get('category', 'N/A')}, Confidence: {assessment.get('final_decision', {}).get('confidence', 'N/A')}")
+    else:
+        print(assessment)
     print("=" * 60)
 
     # Update state - handle both dict and GraphState
     if isinstance(state, dict):
         updated_state = state.copy()
         updated_state["final_assessment"] = assessment
+        # Extract final category and confidence if structured output
+        if isinstance(assessment, dict):
+            final_decision = assessment.get("final_decision", {})
+            updated_state["final_category"] = final_decision.get("category")
+            updated_state["final_confidence"] = final_decision.get("confidence")
     else:
         updated_state = state.copy()
         updated_state.final_assessment = assessment
+        # Extract final category and confidence if structured output
+        if isinstance(assessment, dict):
+            final_decision = assessment.get("final_decision", {})
+            updated_state.final_category = final_decision.get("category")
+            updated_state.final_confidence = final_decision.get("confidence")
 
     return updated_state
 
 
-def extract_final_category_from_assessment(assessment: str) -> Dict[str, Any]:
+def extract_final_category_from_assessment(assessment: Union[str, Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Extract the final triage category and confidence from the assessment text.
+    Extract the final triage category and confidence from the assessment.
+    Supports both structured dict output (new) and string output (legacy).
 
     Args:
-        assessment: Complete triage assessment text
+        assessment: Complete triage assessment (dict or string)
 
     Returns:
         Dictionary with extracted category, confidence, and rationale
@@ -230,6 +257,17 @@ def extract_final_category_from_assessment(assessment: str) -> Dict[str, Any]:
     import re
 
     result = {"category": None, "confidence": None, "rationale": None}
+
+    # Handle structured output (dict format)
+    if isinstance(assessment, dict):
+        final_decision = assessment.get("final_decision", {})
+        result["category"] = final_decision.get("category")
+        result["confidence"] = final_decision.get("confidence")
+        result["rationale"] = final_decision.get("reason")
+        print(f"DEBUG: Extracted from structured output: {result}")
+        return result
+
+    # Legacy string parsing below (for backwards compatibility)
 
     # Extract final triage category with multiple robust patterns
     final_category_patterns = [

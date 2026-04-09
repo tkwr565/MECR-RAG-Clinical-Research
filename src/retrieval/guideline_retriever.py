@@ -10,12 +10,16 @@ from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from ..data.state import GraphState
+from ..models.schemas import GuidelineRetrievalOutput
 from ..utils.parsers import GuidelineSectionParser
 
 
 def create_guideline_selection_prompt() -> ChatPromptTemplate:
     """
     Create the prompt template for guideline section selection.
+
+    Note: This prompt is optimized for structured output and does not include
+    JSON format instructions (handled by Pydantic schema).
 
     Returns:
         ChatPromptTemplate for guideline selection
@@ -42,29 +46,18 @@ def create_guideline_selection_prompt() -> ChatPromptTemplate:
         1. Life-threatening symptoms (chest pain, SOB, altered consciousness)
         2. Abnormal vital signs meeting thresholds above
         3. Specific documented complaints
-        4. If no specific sections apply, return "None".
-        
-        CRITICAL OUTPUT FORMAT:
-        - Return ONLY the EXACT section titles as they appear in the list
-        - Do NOT add "Section:" or any other prefix/suffix
-        - Use comma-separated format for multiple sections
-        - Maximum 2 sections only
-        
-        Example:
-        Correct output: Chest pain (cardiac features), Heart Rate (Adult only)
-        Correct output: Respiratory Rate and Signs
-        Correct output: None
+        4. If no specific sections apply, select none.
         """,
             ),
             (
                 "user",
                 """
         Clinical Summary: {summary_text}
-        
+
         Available Guideline Sections:
         {guideline_section_metadata}
-        
-        Selected Sections (EXACT titles only, max 2, comma-separated):
+
+        Based on the clinical summary, which guideline sections are most relevant?
         """,
             ),
         ]
@@ -94,18 +87,18 @@ def select_guideline_sections(
     guideline_section_metadata: List[Dict[str, str]],
     llm,
     max_sections: int = 2,
-) -> List[str]:
+) -> tuple[List[str], str]:
     """
-    Select relevant guideline sections based on case summary.
+    Select relevant guideline sections based on case summary using structured output.
 
     Args:
         summary_text: Clinical case summary
         guideline_section_metadata: Available guideline sections with metadata
         llm: Language model for selection
-        max_sections: Maximum number of sections to select
+        max_sections: Maximum number of sections to select (default: 2)
 
     Returns:
-        List of selected section titles
+        Tuple of (selected section titles, reasoning)
     """
     # Create the prompt
     prompt = create_guideline_selection_prompt()
@@ -118,22 +111,18 @@ def select_guideline_sections(
         ),
     }
 
-    # Get LLM response
-    chain = prompt | llm | StrOutputParser()
+    # Use structured output - no manual parsing needed
+    structured_llm = llm.with_structured_output(GuidelineRetrievalOutput)
+    chain = prompt | structured_llm
+
+    # Get structured response automatically
     response = chain.invoke(input_values)
 
-    print("============= guideline selection response =============")
-    print(response)
+    print("============= Native Structured Guideline Selection =============")
+    print(f"Selected sections: {response.selected_sections}")
+    print(f"Reasoning: {response.reasoning}")
 
-    # Parse response
-    available_sections = [meta["section_title"] for meta in guideline_section_metadata]
-    parser = GuidelineSectionParser(available_sections)
-    selected_sections = parser.parse(response, max_sections)
-
-    print("============= Optimized Guideline Selection =============")
-    print(f"Selected sections: {selected_sections}")
-
-    return selected_sections
+    return response.selected_sections, response.reasoning
 
 
 def retrieve_guideline_content(
@@ -162,8 +151,8 @@ def optimized_guideline_retrieval_decision(
     state: GraphState, llm, max_sections: int = 2
 ) -> GraphState:
     """
-    Optimized guideline retrieval focusing on chief complaint and abnormal vitals only.
-    Limits to 1-2 most relevant sections (GraphState node function).
+    Optimized guideline retrieval with structured output focusing on chief complaint
+    and abnormal vitals. Limits to 1-2 most relevant sections (GraphState node function).
 
     Args:
         state: Current GraphState with summary_text and guideline_section_metadata
@@ -171,7 +160,7 @@ def optimized_guideline_retrieval_decision(
         max_sections: Maximum number of sections to select
 
     Returns:
-        Updated state with selected_guideline_sections
+        Updated state with selected_guideline_sections and guideline_reasoning
     """
     # Handle both dict and GraphState objects
     if isinstance(state, dict):
@@ -181,7 +170,8 @@ def optimized_guideline_retrieval_decision(
         summary_text = state.summary_text
         guideline_section_metadata = state.guideline_section_metadata
 
-    selected_sections = select_guideline_sections(
+    # Get structured response with both sections and reasoning
+    selected_sections, reasoning = select_guideline_sections(
         summary_text=summary_text,
         guideline_section_metadata=guideline_section_metadata,
         llm=llm,
@@ -192,9 +182,11 @@ def optimized_guideline_retrieval_decision(
     if isinstance(state, dict):
         updated_state = state.copy()
         updated_state["selected_guideline_sections"] = selected_sections
+        updated_state["guideline_reasoning"] = reasoning
     else:
         updated_state = state.copy()
         updated_state.selected_guideline_sections = selected_sections
+        updated_state.guideline_reasoning = reasoning
 
     return updated_state
 

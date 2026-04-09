@@ -28,6 +28,49 @@ The system implements a novel **3-step reasoning framework** that integrates:
 
 ---
 
+## 📚 Related Publications
+
+This repository supports two research publications on retrieval-augmented LLMs for emergency medicine:
+
+### Publication 1: Multi-Evidence Clinical Reasoning System (Published)
+
+**Citation**: Wong HS, Wong TK. Multi-Evidence Clinical Reasoning With Retrieval-Augmented Generation for Emergency Triage: Retrospective Evaluation Study. *JMIR Med Inform* 2025;13:e82026. DOI: [10.2196/82026](https://doi.org/10.2196/82026)
+
+**Focus**: Development and validation of the MECR-RAG system for emergency triage category assignment across all acuity levels (Categories 1-5).
+
+**Key Findings**:
+- MECR-RAG achieved QWK 0.902 vs expert nurse consensus (0.887)
+- Multi-evidence retrieval (guidelines + past cases) outperformed single-evidence approaches
+- DeepSeek-V3 showed strongest performance among tested LLMs
+- System demonstrated non-inferiority to clinical experts
+
+**Implementation**: Original system with string-based LLM outputs (v1.0)
+
+### Publication 2: Category 3 Deterioration Detection 
+
+**Authors**: Li CY, Wong TK, Wong HS
+
+**Title**: Low-burden identification of severe early deterioration among Category 3 emergency department attendances using a retrieval-augmented large language model: a retrospective outcome-defined case-control study
+
+**Focus**: Application of MECR-RAG for identifying severe early deterioration risk specifically in Category 3 (Urgent) ED attendances.
+
+**Key Findings**:
+- Retrieval-augmented model achieved **68.1% sensitivity** at **10% alert burden**
+- Baseline LLM (no retrieval) achieved only 27.8% sensitivity at same burden
+- Multi-evidence retrieval critical for detecting subtle deterioration indicators
+- Demonstrates clinical utility for triaging-within-triage in high-volume urgent cases
+
+**Implementation**: Enhanced system with structured Pydantic outputs (v2.0) enabling programmatic extraction of triage categories, confidence scores, and reasoning steps for case-control study analysis.
+
+### Repository Version History
+
+- **v1.0** (Publication 1): String-based LLM outputs with regex parsing for category extraction
+- **v2.0** (Publication 2): Structured Pydantic outputs with automatic schema validation, enabling robust programmatic analysis of multi-step reasoning for deterioration detection research
+
+The structured output architecture (v2.0) was developed to support the deterioration detection study's requirement for reliable, machine-readable extraction of clinical reasoning at each decision step.
+
+---
+
 ## 🏗️ System Architecture
 
 ### Core Pipeline
@@ -50,6 +93,40 @@ Input Case → Preprocessing → Guideline Retrieval → Specialty Prediction �
 - **Azure OpenAI GPT-4o**: Comparative analysis 
 - **Anthropic Claude-3.7**: Alternative reasoning model
 - **Azure Text-Embedding-3-Small**: Semantic similarity
+
+---
+
+## ⚠️ Repository Scope & Data Availability
+
+### What's Included
+
+✅ **Complete source code** - All preprocessing, indexing, retrieval, and generation modules
+✅ **Executable templates** - Ready-to-run scripts and notebooks
+✅ **Demo cases** - 5 synthetic/anonymized cases across all triage categories
+✅ **Documentation** - Comprehensive setup and methodology guides
+✅ **Structured output implementation** - v2.0 Pydantic schema architecture
+
+### What Requires Reconstruction
+
+Due to **institutional and regulatory restrictions**, the following are **not included**:
+
+❌ **Hong Kong A&E Triage Guidelines (HKAETG)** - Source text redistribution not permitted
+❌ **Processed guideline databases** - Derived from restricted source material
+❌ **Medical case records** - Patient data excluded for privacy compliance
+❌ **Vector embeddings** - Historical case embeddings excluded
+
+### Reproducibility Statement
+
+This repository provides **executable templates, transformation scripts, redacted examples, and documentation** sufficient to rerun the complete workflow on an appropriately governed local dataset. To reproduce the full MECR-RAG system:
+
+1. Obtain source HKAETG text with institutional permission
+2. Collect medical case data with ethics approval (IRB/CIRB)
+3. Run preprocessing pipelines (`notebooks/01_Data_Preprocessing/`)
+4. Build vector databases (`notebooks/02_Indexing/`)
+5. Execute evaluation notebooks (`notebooks/03_Generation/`)
+
+**What works immediately**: Baseline LLM evaluation with included demo cases
+**What requires data**: All RAG variants (guideline-only, case-only, complete MECR-RAG)
 
 ---
 
@@ -142,16 +219,16 @@ Multi-evidence retrieval architecture implementing the complete MECR-RAG methodo
 - **Privacy-Preserving Pipeline**: HIPAA-compliant processing for medical data
 
 ### Research Methodology (`notebooks/`)
-Complete evaluation pipeline from our journal submission:
+Complete evaluation pipeline with structured output architecture (v2.0):
 
-| Notebook | Purpose | Availability |
-|----------|---------|--------------|
-| `01_data_preprocessing.ipynb` | Data preprocessing | ✅ Full access |
-| `02_indexing.ipynb` | Database indexing methodology | ✅ Full access |
-| `03_generation_eval_basic_prompt.ipynb` | Baseline LLM evaluation | ✅ **Works without past case DB** |
-| `04_generation_eval_guideline_RAG.ipynb` | Guideline-only ablation study | ✅ **Works without past case DB** |
-| `05_generation_eval_past_case_RAG.ipynb` | Case-only ablation study | ⚠️ Requires past case database |
-| `06_generation_eval_complete_RAG.ipynb` | Complete MECR evaluation | ⚠️ Requires past case database |
+| Notebook | Purpose | Data Requirements |
+|----------|---------|-------------------|
+| `01_Data_Preprocessing/Preprocessing Pipeline for Traige Guideline and AE case notes.ipynb` | Data preprocessing pipeline | ⚠️ Requires source HKAETG and medical records |
+| `02_Indexing/Indexing Pipeline.ipynb` | Vector database indexing methodology | ⚠️ Requires preprocessed data |
+| `03_Generation/Baseline LLM.ipynb` | Baseline LLM evaluation | ✅ **Works with demo cases only** |
+| `03_Generation/RAG (Guideline Only).ipynb` | Guideline-only ablation study | ⚠️ Requires guideline database |
+| `03_Generation/RAG (Past Case Only).ipynb` | Case-only ablation study | ⚠️ Requires past case database |
+| `03_Generation/RAG (Guideline + Past Case).ipynb` | Complete MECR-RAG evaluation (v2.0) | ⚠️ Requires both guideline & past case databases |
 
 ### Demo Interface (`scripts/`)
 Simple interface for immediate testing and methodology validation:
@@ -163,47 +240,63 @@ Simple interface for immediate testing and methodology validation:
 
 ### Clinical Data Documentation (`data/` & `db/`)
 
-#### Included (✅):
-- `data/guidelines/` - Hong Kong Accident & Emergency Triage Guidelines (processed)
-- `db/triage_sections_with_summaries_*.json` - Processed guideline databases for all LLMs
+#### Excluded Due to Institutional and Regulatory Restrictions (❌):
 
-#### Excluded for Privacy (❌):
-- Past case medical databases (due to ethics requirements)
-- Patient case vector embeddings
-- Historical triage decision data
+Because of institutional and regulatory restrictions, the repository does not contain:
+- **Raw electronic medical record data** - Past case databases
+- **Full historical retrieval-corpus text** - Patient case vector embeddings
+- **Full source HKAETG text** - Hong Kong Accident & Emergency Triage Guidelines (where redistribution is not permitted)
+- **Processed guideline databases** - `db/triage_sections_with_summaries_*.json`
+
+#### What's Included Instead (✅):
+- **Executable templates** - Complete source code and processing scripts
+- **Transformation scripts** - Data preprocessing and indexing pipelines
+- **Redacted examples** - Demo cases with synthetic/anonymized data
+- **Documentation** - Sufficient to rerun the workflow on an appropriately governed local dataset
 
 ---
 
 ## 🧪 Research Validation
 
-### Functional Testing (Available)
+### Available Testing (With Demo Cases Only)
 
-Test ablation configurations that work without past case databases:
+The following functionality works with the included demo cases:
 
 ```bash
-# Baseline LLM evaluation (Notebook 03)
-cd notebooks
-jupyter notebook 03_generation_eval_basic_prompt.ipynb
+# Baseline LLM evaluation (no retrieval databases needed)
+cd notebooks/03_Generation
+jupyter notebook "Baseline LLM.ipynb"
 
-# Guideline-only RAG evaluation (Notebook 04)  
-jupyter notebook 04_generation_eval_guideline_RAG.ipynb
-
-# Demo case processing
+# Demo case processing with structured output (v2.0)
+cd ../..
 python scripts/run_single_case.py scripts/demo_cases/case_1.json --model deepseek --verbose
 ```
 
-### Complete System Testing (Requires Past Case Database)
+### Complete System Testing (Requires Local Datasets)
 
-Full MECR-RAG evaluation requires medical case databases:
+Full MECR-RAG evaluation requires reconstructing the clinical knowledge bases on your local dataset with appropriate institutional approval:
 
 ```bash
-# These require past case databases (not included):
-jupyter notebook 05_generation_eval_past_case_RAG.ipynb      # Past case ablation
-jupyter notebook 06_generation_eval_complete_RAG.ipynb      # Complete system
+# Step 1: Preprocess your institutional data (requires source HKAETG + medical records)
+cd notebooks/01_Data_Preprocessing
+jupyter notebook "Preprocessing Pipeline for Traige Guideline and AE case notes.ipynb"
+
+# Step 2: Build vector databases
+cd ../02_Indexing
+jupyter notebook "Indexing Pipeline.ipynb"
+
+# Step 3: Run ablation studies
+cd ../03_Generation
+jupyter notebook "RAG (Guideline Only).ipynb"          # Requires guideline database
+jupyter notebook "RAG (Past Case Only).ipynb"          # Requires past case database
+jupyter notebook "RAG (Guideline + Past Case).ipynb"  # Complete MECR-RAG (v2.0)
 
 # Single case processing with full pipeline
-python scripts/run_single_case.py scripts/demo_cases/case_1.json --model deepseek  # Will show database missing warnings
+cd ../../..
+python scripts/run_single_case.py <your_case.json> --model deepseek --verbose
 ```
+
+**Note**: All RAG variants require reconstructing the knowledge bases following our preprocessing methodology with your own appropriately governed medical data and institutional approval.
 
 ---
 
@@ -256,48 +349,164 @@ Our system processes emergency department cases following this structure:
 
 ## ⚠️ System Limitations & Data Privacy
 
-### Past Case Database Exclusion
+### Excluded Clinical Knowledge Bases
 
-**Important**: Past case medical databases are **NOT included** in this repository due to ethics requirements and privacy protection:
+**Important**: Due to institutional and regulatory restrictions, the following are **NOT included** in this repository:
 
-- **Missing Components**: `db/past_case/` directories containing 3,000 medical cases per LLM
-- **Impact on Functionality**: 
+#### 1. **Hong Kong A&E Triage Guidelines (HKAETG)**
+- **Missing**: `data/guidelines/` - Source HKAETG text and processed guideline databases
+- **Reason**: Redistribution of HKAETG source material is not permitted
+- **Impact**:
+  - Cannot run guideline-based RAG evaluations without reconstruction
+  - `notebooks/03_Generation/RAG (Guideline Only).ipynb` requires guideline database
+  - `notebooks/03_Generation/RAG (Guideline + Past Case).ipynb` requires guideline database
+
+#### 2. **Past Case Medical Databases**
+- **Missing**: `db/past_case/` - Vector databases containing 3,000 medical cases per LLM
+- **Reason**: Patient privacy and ethics requirements
+- **Impact**:
   - `run_single_case.py` will show warnings about missing databases
-  - Notebooks 05-06 require past case databases to execute
+  - `notebooks/03_Generation/RAG (Past Case Only).ipynb` requires past case database
+  - `notebooks/03_Generation/RAG (Guideline + Past Case).ipynb` requires past case database
   - Full MECR-RAG pipeline needs user-provided medical case databases
-- **Alternative Access**: Notebooks 03-04 demonstrate methodology without requiring past case data
 
 ### Functional Capabilities
 
-#### ✅ **Available Without Past Case Database**:
-- Clinical guideline retrieval and processing
-- Baseline LLM evaluation (Notebook 03)
-- Guideline-only RAG evaluation (Notebook 04)  
+#### ✅ **Available Without External Data**:
+- Baseline LLM evaluation (no retrieval)
 - Demo case structure validation
 - System architecture exploration
+- Source code and preprocessing pipelines
+
+#### ⚠️ **Requires Guideline Database**:
+- Guideline section retrieval
+- Guideline-only RAG evaluation
+- Condition-specific protocol application
 
 #### ⚠️ **Requires Past Case Database**:
+- Historical case similarity retrieval
+- Past case-only RAG evaluation
+- Real-world pattern recognition
+
+#### ⚠️ **Requires Both Databases**:
 - Complete 3-step MECR reasoning
-- Past case similarity retrieval
-- Full system evaluation (Notebooks 05-06)
+- Full MECR-RAG evaluation
+- Multi-evidence integration
 
 ### For Researchers
 
-To implement the complete MECR-RAG system:
+To implement the complete MECR-RAG system, you must reconstruct both knowledge bases:
 
-1. **Prepare Medical Case Database**: Create past case databases following our preprocessing methodology
-2. **Structure Requirements**: Cases must follow our clinical data format (see demo cases)
-3. **Privacy Compliance**: Ensure appropriate IRB approval for medical data use
-4. **Database Integration**: Follow our indexing methodology (Notebook 02) for vector database creation
+1. **Obtain Source Materials**:
+   - Acquire HKAETG text with institutional permission
+   - Collect medical case data with appropriate IRB/ethics approval
+
+2. **Follow Preprocessing Methodology**:
+   - Process HKAETG using `notebooks/01_Data_Preprocessing/` (adapt to your guideline structure)
+   - Process medical cases following our clinical data format (see demo cases)
+
+3. **Build Vector Databases**:
+   - Create guideline database using `notebooks/02_Indexing/`
+   - Create past case database using `notebooks/02_Indexing/`
+
+4. **Adapt to Your Guidelines**:
+   - **CRITICAL**: Our system is designed for HKAETG structure
+   - If using different triage guidelines, you must adapt the preprocessing and chunking strategy
+   - Follow our methodology but adjust section boundaries and metadata extraction to match your guideline format
 
 ---
-## 🔨 Setting Up Your Own Past Case Database
+## 🔨 Reconstructing Clinical Knowledge Bases
 
-For researchers wanting to implement the complete MECR-RAG system with past case retrieval, follow these steps to create your own medical case database:
+For researchers wanting to implement the complete MECR-RAG system, you must reconstruct both the guideline and past case databases following our methodology.
 
-### Step 1: Prepare Medical Case Data
+### ⚠️ Important: Guideline Adaptation Required
 
-#### Option A: If You Have Hong Kong AED PDF Medical Records
+**Our system is designed specifically for Hong Kong Accident & Emergency Triage Guidelines (HKAETG) structure**. If you are using different triage guidelines (e.g., ESI, CTAS, MTS, ATS), you **must adapt**:
+
+1. **Preprocessing Strategy**: Modify chunking logic in `notebooks/01_Data_Preprocessing/` to match your guideline structure
+2. **Section Boundaries**: Adjust how sections are identified and extracted
+3. **Metadata Extraction**: Adapt clinical indicator and triage criteria parsing
+4. **Retrieval Logic**: May need modification if your guidelines are not organized by clinical presentation
+
+**Key HKAETG Characteristics** (for comparison):
+- Organized by clinical presentations (e.g., "Chest Pain", "Shortness of Breath", "Abdominal Pain")
+- Each section contains condition-specific triage criteria
+- Sections include discriminators for category assignment
+- Metadata includes clinical indicators and assessment criteria
+
+If your guidelines have a different structure (e.g., discriminator-based like MTS, algorithm-based like ESI), you will need to modify the preprocessing and retrieval components accordingly.
+
+### Part A: Setting Up Guideline Database
+
+#### Step 1: Obtain Source Guidelines
+
+1. **Acquire triage guidelines** appropriate for your institution:
+   - Hong Kong A&E Triage Guidelines (HKAETG) - requires institutional permission
+   - Alternative: Your institution's emergency triage protocols
+   - Alternative: Publicly available triage guidelines (e.g., ESI, CTAS, MTS)
+
+2. **Understand guideline structure**:
+   - Our system is designed for HKAETG's condition-specific sections
+   - Each section covers a clinical presentation (e.g., "Chest Pain", "Shortness of Breath")
+   - Sections contain triage criteria and category recommendations
+
+#### Step 2: Preprocess Guidelines
+
+1. **Adapt preprocessing to your guideline format**:
+   ```bash
+   cd notebooks/01_Data_Preprocessing
+   jupyter notebook "Preprocessing Pipeline for Traige Guideline and AE case notes.ipynb"
+   ```
+
+2. **Critical adaptations needed**:
+   - **Section Chunking**: Adjust chunking strategy to match your guideline structure
+   - **Metadata Extraction**: Extract section titles, summaries, and clinical indicators
+   - **Format Conversion**: Convert to our expected JSON format
+
+3. **Expected output structure**:
+   ```
+   data/
+   └── guidelines/
+       └── processed_guidelines.json    # Your processed guideline sections
+   ```
+
+4. **JSON format per section**:
+   ```json
+   {
+     "section_title": "Chest Pain",
+     "summary": "Assessment criteria for chest pain presentations",
+     "content": "Full guideline text...",
+     "clinical_indicators": ["chest pain", "cardiac", "MI"],
+     "triage_criteria": {
+       "Category 1": "...",
+       "Category 2": "..."
+     }
+   }
+   ```
+
+#### Step 3: Create Guideline Vector Database
+
+1. **Run indexing for guidelines**:
+   ```bash
+   cd notebooks/02_Indexing
+   jupyter notebook "Indexing Pipeline.ipynb"
+   ```
+
+2. **The notebook will create**:
+   ```
+   db/
+   ├── triage_sections_with_summaries_deepseekv3.json
+   ├── triage_sections_with_summaries_gpt-4o.json
+   └── triage_sections_with_summaries_claude-3-7.json
+   ```
+
+### Part B: Setting Up Past Case Database
+
+For researchers wanting to implement past case retrieval, follow these steps to create your own medical case database:
+
+#### Step 1: Prepare Medical Case Data
+
+**Option A: If You Have Hong Kong AED PDF Medical Records**
 If you have Hong Kong AED PDF medical records, follow the complete preprocessing pipeline:
 
 1. **Create the required folder structure:**
@@ -316,9 +525,9 @@ If you have Hong Kong AED PDF medical records, follow the complete preprocessing
    ```
 
 2. **Place your PDF files** in the appropriate triage category folders
-3. **Run preprocessing pipeline** using `01_data_preprocessing.ipynb`
+3. **Run preprocessing pipeline** using `notebooks/01_Data_Preprocessing/Preprocessing Pipeline for Traige Guideline and AE case notes.ipynb`
 
-#### Option B: If You Have Structured Medical Data (Recommended)
+**Option B: If You Have Structured Medical Data (Recommended)**
 If you already have structured medical case data, skip directly to JSON format:
 
 1. **Create the simplified folder structure:**
@@ -336,14 +545,14 @@ If you already have structured medical case data, skip directly to JSON format:
 2. **Format your cases** following our clinical data structure (see demo cases for exact format)
 3. **Save each case** as a separate `.json` file in the appropriate category folder
 
-### Step 2: Create Vector Database
+#### Step 2: Create Past Case Vector Database
 
 Once you have your JSON case files ready:
 
 1. **Run the indexing notebook:**
    ```bash
-   cd notebooks
-   jupyter notebook 02_indexing.ipynb
+   cd notebooks/02_Indexing
+   jupyter notebook "Indexing Pipeline.ipynb"
    ```
 
 2. **The notebook will create:**
@@ -351,27 +560,36 @@ Once you have your JSON case files ready:
    db/
    └── past_case/
        ├── db_{model}_1000case/     # 1K case database
-       ├── db_{model}_2000case/     # 2K case database  
+       ├── db_{model}_2000case/     # 2K case database
        └── db_{model}_3000case/     # 3K case database
            ├── summary_vectordb/    # Vector embeddings with metadata
            ├── json_store/           # Processed cases json files
    ```
 
-### Step 3: Test Complete System
+#### Step 3: Test Complete System
 
-After setting up your past case database:
+After setting up both guideline and past case databases:
 
 ```bash
 # Test complete MECR-RAG pipeline
 python scripts/run_single_case.py scripts/demo_cases/case_1.json --model deepseek
 
-# Run complete evaluation notebooks
-jupyter notebook 05_generation_eval_past_case_RAG.ipynb     # Past case ablation
-jupyter notebook 06_generation_eval_complete_RAG.ipynb     # Complete MECR evaluation
+# Run evaluation notebooks
+cd notebooks/03_Generation
+jupyter notebook "RAG (Guideline Only).ipynb"          # Guideline-only ablation
+jupyter notebook "RAG (Past Case Only).ipynb"          # Past case-only ablation
+jupyter notebook "RAG (Guideline + Past Case).ipynb"  # Complete MECR-RAG (v2.0)
 ```
 
 ### Data Requirements
 
+#### For Guideline Database:
+- **Source Material**: Triage guidelines structured by clinical presentation/condition
+- **Minimum Sections**: 15+ guideline sections recommended for comprehensive coverage
+- **Structure Adaptation**: If not using HKAETG, adapt preprocessing to match your guideline format
+- **Critical Note**: Our retrieval assumes condition-based sections; different structures require code modification
+
+#### For Past Case Database:
 - **Minimum Cases**: 1,000+ cases recommended for meaningful retrieval
 - **Balanced Distribution**: Include cases across all 5 triage categories
 - **Clinical Completeness**: Each case should include demographics, clinical presentation, vitals
@@ -414,25 +632,178 @@ Network: Internet access for LLM APIs
 
 ---
 
-## 📖 Research Methodology
+## 🔄 System Updates: Structured Output Architecture (v2.0)
 
-### Experimental Design
+### Motivation for Update
 
-Our study implements a comparative evaluation across three LLM architectures:
+Following the publication of our initial work, we have enhanced the MECR-RAG system with **structured output architecture** to improve reliability, reproducibility, and machine-readability of clinical reasoning outputs. This update addresses key challenges identified during deployment and peer review.
 
-- **Dataset**: 236 consensus-labeled emergency department cases
-- **Retrieval Database**: 3,000 anonymized cases per LLM model
-- **Primary Metric**: Quadratic weighted kappa (QWK) agreement with expert nurses
-- **Statistical Analysis**: Bootstrap confidence intervals, McNemar's tests, ablation studies
-- **Cross-LLM Validation**: DeepSeek-V3, GPT-4o, Claude-3.7 Sonnet
+### Technical Enhancements
 
-### Key Findings
+#### 1. **Pydantic Schema-Based Outputs**
 
-- **Expert-Level Performance**: QWK 0.902 vs expert agreement 0.887
-- **Significant Improvement**: +0.101 QWK over baseline LLM
-- **Reduced Overtriage**: 12.7% vs 28.8% for baseline LLM  
-- **Cross-LLM Generalization**: Consistent improvements across all models
-- **Component Validation**: Both guideline and case retrieval contribute meaningfully
+**Previous Implementation (v1.0)**:
+- LLM outputs were free-form markdown text
+- Manual regex-based parsing to extract triage categories
+- Prone to parsing failures and format inconsistencies
+- Difficult to programmatically access reasoning steps
+
+**Current Implementation (v2.0)**:
+- Native Pydantic schema validation using `.with_structured_output()`
+- Automatic type checking and field validation
+- Direct JSON-serializable outputs
+- Machine-readable reasoning at each decision step
+
+**Schema Definitions**:
+```python
+class GuidelineRetrievalOutput(BaseModel):
+    """Structured guideline section selection"""
+    selected_sections: List[str]  # Max 2 sections
+    reasoning: str                # Explanation for selection
+
+class TriageStep(BaseModel):
+    """Individual reasoning step"""
+    category: Literal["1", "2", "3", "4", "5", "Not specified"]
+    confidence: Literal["High", "Medium", "Low"]
+    reason: str
+
+class TriagePredictionOutput(BaseModel):
+    """Complete 3-step triage assessment"""
+    step1_clinical_risk: TriageStep
+    step2_guidelines: TriageStep
+    step3_realworld_factors: TriageStep
+    final_decision: TriageStep
+```
+
+#### 2. **Enhanced LLM Integration**
+
+**DeepSeek-V3 Support**:
+- Added native `langchain-deepseek` integration
+- Fallback to OpenAI-compatible API for backwards compatibility
+- Optimized for structured output generation
+
+**Multi-Model Compatibility**:
+- All three LLMs (DeepSeek-V3, GPT-4o, Claude-3.7) now support structured outputs
+- Consistent schema validation across different model architectures
+- Unified error handling and retry logic
+
+#### 3. **Improved Reliability Features**
+
+**Automatic Retry Logic**:
+```python
+def execute_structured_node_with_retry(node_func, state, node_name, max_retries=3):
+    """Retry failed structured outputs with validation"""
+    for attempt in range(max_retries):
+        try:
+            return node_func(state)  # Pydantic validates automatically
+        except ValidationError:
+            # Retry on schema violation
+            continue
+    return failed_state  # Mark processing failure
+```
+
+**Error Tracking**:
+- Failed processing marked in state with `processing_failed=True`
+- Detailed error messages captured in `failure_reason`
+- Node-level failure tracking for debugging
+
+#### 4. **Backwards Compatibility**
+
+The system maintains full backwards compatibility with v1.0 outputs:
+
+```python
+def extract_final_category_from_assessment(assessment: Union[str, Dict[str, Any]]):
+    """Handles both structured dict (v2.0) and string (v1.0) formats"""
+    if isinstance(assessment, dict):
+        # v2.0: Direct access to structured output
+        return assessment["final_decision"]["category"]
+    else:
+        # v1.0: Fallback to regex parsing
+        return parse_category_from_text(assessment)
+```
+
+### Implementation Changes
+
+#### Updated Components
+
+| Component | Change | Impact |
+|-----------|--------|--------|
+| **Guideline Retrieval** | `GuidelineRetrievalOutput` schema | Now captures reasoning for section selection |
+| **Specialty Prediction** | Dynamic schema generation | Validates specialty names at runtime |
+| **Final Triage Assessment** | `TriagePredictionOutput` schema | Structured 4-step reasoning with confidence |
+| **State Management** | Added fields: `guideline_reasoning`, `final_category`, `final_confidence` | Enhanced output analysis |
+
+#### New Files
+
+- `src/models/schemas.py`: Pydantic schema definitions
+- `src/utils/structured_output.py`: Retry logic and token tracking
+- `IMPLEMENTATION_GUIDE.md`: Technical migration documentation
+- `CHANGES_SUMMARY.md`: Detailed changelog for v2.0
+
+#### Modified Files
+
+- `src/models/llm_factory.py`: DeepSeek native client support
+- `src/data/state.py`: Extended state with structured output fields
+- `src/retrieval/guideline_retriever.py`: Structured guideline selection
+- `src/retrieval/specialty_predictor.py`: Dynamic specialty schema
+- `src/generation/triage_assessor.py`: Structured 3-step reasoning
+- `scripts/run_single_case.py`: Enhanced output display
+
+### Benefits for Research
+
+#### 1. **Reproducibility**
+- Deterministic output structure across runs
+- No parsing ambiguity or format variations
+- Consistent schema validation
+
+#### 2. **Interpretability**
+- Direct access to confidence scores for each reasoning step
+- Explicit reasoning captured for each decision
+- Machine-readable audit trail
+
+#### 3. **Extensibility**
+- Easy to add new reasoning steps or fields
+- Schema evolution supported via Pydantic versioning
+- Compatible with automated evaluation pipelines
+
+#### 4. **Clinical Deployment**
+- Structured outputs integrate with electronic health records (EHR)
+- Real-time monitoring of confidence levels
+- Automated quality assurance via schema validation
+
+### Migration Guide
+
+For researchers using v1.0, the system automatically handles both formats:
+
+```python
+# v1.0 output (string)
+assessment = "### STEP 1: CLINICAL RISK ASSESSMENT\n..."
+category = extract_category_from_text(assessment)  # Regex parsing
+
+# v2.0 output (structured dict)
+assessment = {
+    "step1_clinical_risk": {"category": "2", "confidence": "High", ...},
+    "final_decision": {"category": "2", "confidence": "High", ...}
+}
+category = assessment["final_decision"]["category"]  # Direct access
+```
+
+**No changes required** to existing evaluation scripts - the `extract_final_category_from_assessment()` function handles both formats transparently.
+
+### Validation
+
+The structured output update has been validated on:
+- ✅ All 236 test cases from the original study
+- ✅ Cross-LLM consistency (DeepSeek-V3, GPT-4o, Claude-3.7)
+- ✅ Backwards compatibility with v1.0 outputs
+- ✅ Retry logic under simulated failures
+
+### Documentation
+
+Complete technical documentation available in:
+- `IMPLEMENTATION_GUIDE.md` - Detailed migration guide
+- `CHANGES_SUMMARY.md` - Comprehensive changelog
+- `notebooks/03_Generation/` - Evaluation notebooks with structured outputs
 
 ---
 
@@ -482,26 +853,37 @@ MECR-RAG-Clinical-Research/
 │   ├── data/                    # Data management utilities
 │   └── utils/                   # Helper functions
 ├── notebooks/                   # Research methodology and evaluation
-│   ├── 01_data_preprocessing.ipynb
-│   ├── 02_indexing.ipynb
-│   ├── 03_generation_eval_basic_prompt.ipynb      # ✅ Works without past case DB
-│   ├── 04_generation_eval_guideline_RAG.ipynb    # ✅ Works without past case DB  
-│   ├── 05_generation_eval_past_case_RAG.ipynb    # ⚠️ Requires past case DB
-│   └── 06_generation_eval_complete_RAG.ipynb     # ⚠️ Requires past case DB
+│   ├── 01_Data_Preprocessing/
+│   │   └── Preprocessing Pipeline for Traige Guideline and AE case notes.ipynb
+│   ├── 02_Indexing/
+│   │   └── Indexing Pipeline.ipynb
+│   └── 03_Generation/
+│       ├── Baseline LLM.ipynb                      # ✅ Works with demo cases
+│       ├── RAG (Guideline Only).ipynb             # ⚠️ Requires guideline DB
+│       ├── RAG (Past Case Only).ipynb             # ⚠️ Requires past case DB
+│       └── RAG (Guideline + Past Case).ipynb      # ⚠️ Requires both DBs (v2.0)
 ├── scripts/                     # Research interface and utilities
 │   ├── run_single_case.py       # Single case processing script
-│   └── demo_cases/              # Representative clinical cases
+│   └── demo_cases/              # ✅ Synthetic/anonymized representative cases
 │       ├── case_1.json          # Category 1 (Critical)
 │       ├── case_2.json          # Category 2 (Emergency)
 │       ├── case_3.json          # Category 3 (Urgent)
 │       ├── case_4.json          # Category 4 (Semi-urgent)
 │       └── case_5.json          # Category 5 (Non-urgent)
-├── data/                        # Clinical knowledge base
-│   └── guidelines/              # ✅ Hong Kong Accident & Emergency Triage Guidelines
-└── db/                          # Processed knowledge databases
-    ├── triage_sections_with_summaries_deepseekv3.json    # ✅ Included
-    ├── triage_sections_with_summaries_gpt-4o.json       # ✅ Included
-    └── triage_sections_with_summaries_claude-3-7.json   # ✅ Included
+├── data/                        # Clinical knowledge base (empty - see note below)
+│   ├── guidelines/              # ❌ HKAETG text not included (redistribution restricted)
+│   ├── past_case/               # ❌ Medical records not included (privacy)
+│   └── test_case/               # ❌ Test cases not included (privacy)
+└── db/                          # Processed knowledge databases (empty - see note below)
+    ├── triage_sections_with_summaries_*.json  # ❌ Guideline DBs not included
+    └── past_case/                              # ❌ Case embeddings not included
 ```
 
-**Note**: Medical case data (`data/past_case`, `data/test_case`) and databases (`db/past_case/`) are excluded due to privacy requirements but can be reconstructed following our preprocessing methodology with appropriate medical data and IRB approval.
+**Important Note**: Due to institutional and regulatory restrictions, clinical knowledge bases (`data/guidelines/`, `data/past_case/`, `data/test_case/`) and processed databases (`db/`) are **not included** in this repository. To reproduce the full system, you must:
+
+1. **Obtain source data** with appropriate institutional approval and ethics clearance
+2. **Run preprocessing pipelines** (`01_Data_Preprocessing/`) on your local dataset
+3. **Build vector databases** (`02_Indexing/`) following our methodology
+4. **Execute evaluation notebooks** (`03_Generation/`) with your reconstructed knowledge bases
+
+The repository provides executable templates, transformation scripts, and documentation sufficient to rerun the complete workflow on an appropriately governed local dataset.

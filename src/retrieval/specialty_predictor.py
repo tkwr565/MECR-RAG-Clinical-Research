@@ -9,12 +9,15 @@ from typing import Dict, Any
 from langchain.prompts import ChatPromptTemplate
 
 from ..data.state import GraphState
-from ..utils.parsers import SpecialtyPrediction
+from ..models.schemas import create_specialty_prediction_schema
 
 
 def create_specialty_prediction_prompt() -> ChatPromptTemplate:
     """
     Create the prompt template for attending specialty prediction.
+
+    Note: This prompt is optimized for structured output and does not include
+    JSON format examples (handled by Pydantic schema).
 
     Returns:
         ChatPromptTemplate for specialty prediction
@@ -36,29 +39,15 @@ def create_specialty_prediction_prompt() -> ChatPromptTemplate:
            - Injury-related cases could be covered by "Surgery", "Orthopaedics" or "Neurosurgery"
            - Paediatric cases could be covered by "Paediatrics" and other specialties
            If overlapping specialty is possible, include in "secondary_specialty"
-
-        Provide your answer in JSON format with the following structure:
-        {{
-          "primary_specialty": "SpecialtyName",
-          "secondary_specialty": "SpecialtyName or null if no secondary specialty is needed",
-          "explanation": "Brief explanation of your reasoning (1-2 sentences)"
-        }}
-
-        Example output:
-        {{
-          "primary_specialty": "Surgery",
-          "secondary_specialty": "Orthopaedics",
-          "explanation": "The patient has sustained injuries to both the chest and lower back. Chest trauma typically falls under Surgery, while lower back injury may require assessment and management by Orthopaedics."
-        }}
         """,
             ),
             (
                 "user",
                 """
-        Medical case summary: 
+        Medical case summary:
         {summary_text}
 
-        Your Answer:
+        Based on the clinical presentation, which specialty should handle this case?
         """,
             ),
         ]
@@ -69,7 +58,7 @@ def predict_attending_specialty(
     summary_text: str, specialty_list: list, llm
 ) -> Dict[str, Any]:
     """
-    Predict the attending specialty for a given case summary.
+    Predict the attending specialty for a given case summary using structured output.
 
     Args:
         summary_text: Clinical case summary
@@ -87,12 +76,21 @@ def predict_attending_specialty(
         "specialties": ", ".join(specialty_list),
     }
 
-    # Get the LLM response with custom parser
-    chain = prompt | llm | SpecialtyPrediction()
+    # Create dynamic schema from specialty list
+    SpecialtyPredictionOutput = create_specialty_prediction_schema(specialty_list)
+
+    # Use structured output - automatic validation
+    structured_llm = llm.with_structured_output(SpecialtyPredictionOutput)
+    chain = prompt | structured_llm
 
     try:
         response = chain.invoke(input_values)
-        return response
+        # Convert Pydantic model to dict
+        return {
+            "primary_specialty": response.primary_specialty,
+            "secondary_specialty": response.secondary_specialty,
+            "explanation": response.explanation,
+        }
     except Exception as e:
         print(f"Error predicting specialty: {e}")
         return {

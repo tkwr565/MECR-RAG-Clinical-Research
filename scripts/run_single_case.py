@@ -213,17 +213,32 @@ def display_results(result, args):
     # Extract key information
     summary = result.get("summary_text", "N/A")
     guidelines = result.get("selected_guideline_sections", [])
+    guideline_reasoning = result.get("guideline_reasoning", "N/A")
     past_cases_count = len(result.get("retrieved_cases_content", []))
     assessment = result.get("final_assessment", "N/A")
 
-    # Extract final category if available
-    extracted_info = (
-        extract_final_category_from_assessment(assessment)
-        if assessment != "N/A"
-        else {}
-    )
-    final_category = extracted_info.get("category", "N/A")
-    confidence = extracted_info.get("confidence", "N/A")
+    # Handle both structured (dict) and legacy (string) assessment formats
+    if isinstance(assessment, dict):
+        # New structured format - direct access
+        final_category = assessment.get("final_decision", {}).get("category", "N/A")
+        confidence = assessment.get("final_decision", {}).get("confidence", "N/A")
+        extracted_info = {
+            "category": final_category,
+            "confidence": confidence,
+            "step1_category": assessment.get("step1_clinical_risk", {}).get("category", "N/A"),
+            "step2_category": assessment.get("step2_guidelines", {}).get("category", "N/A"),
+            "step3_category": assessment.get("step3_realworld_factors", {}).get("category", "N/A"),
+            "rationale": assessment.get("final_decision", {}).get("reason", "N/A"),
+        }
+    else:
+        # Legacy string format - use extraction function
+        extracted_info = (
+            extract_final_category_from_assessment(assessment)
+            if assessment != "N/A"
+            else {}
+        )
+        final_category = extracted_info.get("category", "N/A")
+        confidence = extracted_info.get("confidence", "N/A")
 
     # Prepare output
     output_data = {
@@ -237,11 +252,13 @@ def display_results(result, args):
         "results": {
             "clinical_summary": summary,
             "selected_guidelines": guidelines,
+            "guideline_reasoning": guideline_reasoning,
             "guidelines_count": len(guidelines),
             "past_cases_retrieved": past_cases_count,
             "final_category": final_category,
             "confidence": confidence,
             "full_assessment": assessment,
+            "structured_output": isinstance(assessment, dict),
         },
         "extracted_info": extracted_info,
     }
@@ -253,9 +270,16 @@ def display_results(result, args):
         print("=" * 60)
         print(f"Clinical Summary: {summary[:200]}...")
         print(f"Guidelines Retrieved: {len(guidelines)} - {guidelines}")
+        if guideline_reasoning != "N/A":
+            print(f"Guideline Reasoning: {guideline_reasoning}")
         print(f"Past Cases Retrieved: {past_cases_count}")
-        print(f"Final Triage Category: {final_category}")
-        print(f"Confidence: {confidence}")
+        print(f"\nTriage Assessment:")
+        if isinstance(assessment, dict):
+            print(f"  Step 1 (Clinical Risk): Category {extracted_info.get('step1_category', 'N/A')}")
+            print(f"  Step 2 (Guidelines): Category {extracted_info.get('step2_category', 'N/A')}")
+            print(f"  Step 3 (Real-world): Category {extracted_info.get('step3_category', 'N/A')}")
+        print(f"  Final Triage Category: {final_category}")
+        print(f"  Confidence: {confidence}")
         print("=" * 60)
 
     # Save or display results

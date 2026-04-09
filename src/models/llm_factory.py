@@ -9,6 +9,13 @@ from typing import Optional
 from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_anthropic import ChatAnthropic
 
+try:
+    from langchain_deepseek import ChatDeepSeek
+    DEEPSEEK_AVAILABLE = True
+except ImportError:
+    DEEPSEEK_AVAILABLE = False
+    ChatDeepSeek = None
+
 from ..config.settings import settings
 
 
@@ -17,7 +24,8 @@ def initialize_deepseek(
     base_url: Optional[str] = None,
     model_name: Optional[str] = None,
     temperature: Optional[float] = None,
-) -> ChatOpenAI:
+    use_native_client: bool = True,
+) -> ChatOpenAI | ChatDeepSeek:
     """
     Initialize DeepSeek client using LangChain.
 
@@ -26,18 +34,30 @@ def initialize_deepseek(
         base_url: DeepSeek API base URL (defaults to settings)
         model_name: Model name to use (defaults to settings)
         temperature: Temperature for generation (defaults to settings)
+        use_native_client: If True and available, use ChatDeepSeek instead of ChatOpenAI
 
     Returns:
-        ChatOpenAI: Initialized DeepSeek client
+        ChatDeepSeek or ChatOpenAI: Initialized DeepSeek client
     """
-    return ChatOpenAI(
-        model=model_name or settings.DEEPSEEK_MODEL_NAME,
-        api_key=api_key or settings.DEEPSEEK_API_KEY,
-        base_url=base_url or settings.DEEPSEEK_BASE_URL,
-        temperature=(
-            temperature if temperature is not None else settings.DEFAULT_TEMPERATURE
-        ),
-    )
+    if use_native_client and DEEPSEEK_AVAILABLE:
+        # Use native ChatDeepSeek client for better integration
+        return ChatDeepSeek(
+            model=model_name or settings.DEEPSEEK_MODEL_NAME,
+            api_key=api_key or settings.DEEPSEEK_API_KEY,
+            temperature=(
+                temperature if temperature is not None else settings.DEFAULT_TEMPERATURE
+            ),
+        )
+    else:
+        # Fallback to ChatOpenAI with base_url
+        return ChatOpenAI(
+            model=model_name or settings.DEEPSEEK_MODEL_NAME,
+            api_key=api_key or settings.DEEPSEEK_API_KEY,
+            base_url=base_url or settings.DEEPSEEK_BASE_URL,
+            temperature=(
+                temperature if temperature is not None else settings.DEFAULT_TEMPERATURE
+            ),
+        )
 
 
 def initialize_azure_openai(
