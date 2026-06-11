@@ -103,6 +103,7 @@ notebooks/**/output/
 # Raw medical case data (excluded from repository - privacy)
 data/past_case/
 data/test_case/
+data/**
 
 # Source guideline text (excluded from repository - redistribution restricted)
 data/guidelines/

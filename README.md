@@ -89,7 +89,7 @@ Input Case → Preprocessing → Guideline Retrieval → Specialty Prediction �
 
 ### LLM Support
 
-- **DeepSeek-V3**: Primary reasoning engine
+- **DeepSeek V4 Pro**: Primary reasoning engine (migrated from V3; `deepseek-chat` deprecated by provider 2026-07-24)
 - **Azure OpenAI GPT-4o**: Comparative analysis 
 - **Anthropic Claude-3.7**: Alternative reasoning model
 - **Azure Text-Embedding-3-Small**: Semantic similarity
@@ -215,7 +215,7 @@ Multi-evidence retrieval architecture implementing the complete MECR-RAG methodo
 
 - **Multi-Evidence Retrieval**: Combines clinical guidelines + historical case patterns
 - **3-Step Clinical Reasoning**: Structured decision framework mimicking clinical workflow  
-- **Cross-LLM Integration**: Supports DeepSeek-V3, GPT-4o, Claude-3.7 Sonnet
+- **Cross-LLM Integration**: Supports DeepSeek V4 Pro, GPT-4o, Claude-3.7 Sonnet
 - **Privacy-Preserving Pipeline**: HIPAA-compliant processing for medical data
 
 ### Research Methodology (`notebooks/`)
@@ -495,7 +495,7 @@ If your guidelines have a different structure (e.g., discriminator-based like MT
 2. **The notebook will create**:
    ```
    db/
-   ├── triage_sections_with_summaries_deepseekv3.json
+   ├── triage_sections_with_summaries_deepseek-v4-pro.json
    ├── triage_sections_with_summaries_gpt-4o.json
    └── triage_sections_with_summaries_claude-3-7.json
    ```
@@ -677,13 +677,13 @@ class TriagePredictionOutput(BaseModel):
 
 #### 2. **Enhanced LLM Integration**
 
-**DeepSeek-V3 Support**:
-- Added native `langchain-deepseek` integration
-- Fallback to OpenAI-compatible API for backwards compatibility
-- Optimized for structured output generation
+**DeepSeek V4 Pro Support**:
+- Migrated to `langchain-deepseek` native client (`langchain_deepseek.ChatDeepSeek`)
+- Replaced deprecated `ChatOpenAI` wrapper (`deepseek-chat` deprecated by provider 2026-07-24)
+- Optimized for structured output generation with `deepseek-v4-pro` model
 
 **Multi-Model Compatibility**:
-- All three LLMs (DeepSeek-V3, GPT-4o, Claude-3.7) now support structured outputs
+- All three LLMs (DeepSeek V4 Pro, GPT-4o, Claude-3.7) now support structured outputs
 - Consistent schema validation across different model architectures
 - Unified error handling and retry logic
 
@@ -794,7 +794,7 @@ category = assessment["final_decision"]["category"]  # Direct access
 
 The structured output update has been validated on:
 - ✅ All 236 test cases from the original study
-- ✅ Cross-LLM consistency (DeepSeek-V3, GPT-4o, Claude-3.7)
+- ✅ Cross-LLM consistency (DeepSeek V4 Pro, GPT-4o, Claude-3.7)
 - ✅ Backwards compatibility with v1.0 outputs
 - ✅ Retry logic under simulated failures
 
