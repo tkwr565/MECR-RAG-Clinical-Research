@@ -7,7 +7,7 @@ optimized for vector embedding retrieval and similarity search.
 
 import json
 from typing import Dict, Any
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from ..data.state import GraphState

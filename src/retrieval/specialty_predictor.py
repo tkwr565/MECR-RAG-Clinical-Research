@@ -6,7 +6,7 @@ based on case summaries and clinical presentations.
 """
 
 from typing import Dict, Any
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 from ..data.state import GraphState
 from ..models.schemas import create_specialty_prediction_schema

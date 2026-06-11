@@ -6,7 +6,7 @@ using integrated information from guidelines and past cases.
 """
 
 from typing import Dict, Any, List, Union
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from ..data.state import GraphState

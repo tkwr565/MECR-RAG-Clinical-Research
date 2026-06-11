@@ -159,20 +159,25 @@ This repository provides **executable templates, transformation scripts, redacte
 
 ### Test with Demo Cases
 
-**Important Limitation**: Past case related data/databases are **NOT included** due to ethics requirements. Our `src/` and `scripts/run_single_case.py` are designed for **COMPLETE MECR pipeline execution** (both past case database + guideline). Users will not be able to launch the full system without a compatible past case database. However, ablation configurations can still be tested and accessed through individual notebooks: `03_generation_eval_basic_prompt.ipynb`, `04_generation_eval_guideline_RAG.ipynb` (excluding `05_generation_eval_past_case_RAG.ipynb` + `06_generation_eval_complete_RAG.ipynb`, since past case database is needed).
+**Important Limitation**: Past case and guideline databases are **NOT included** due to ethics and redistribution restrictions. `scripts/run_single_case.py` requires **both databases** to run — it will exit with an error if either is missing. For baseline-only testing (no databases needed), use `notebooks/03_Generation/Baseline LLM .ipynb` directly.
 
 We provide five representative emergency department cases spanning all triage categories:
 
 ```bash
-# Test Critical case (Category 1) - Will show database warnings
-python scripts/run_single_case.py scripts/demo_cases/case_1.json --model deepseek --output case_1_prediction.json
+# Baseline LLM evaluation — no databases required
+# Open and run: notebooks/03_Generation/Baseline LLM .ipynb
 
-# Test Emergency case (Category 2) - Will show database warnings  
-python scripts/run_single_case.py scripts/demo_cases/case_2.json --model deepseek --output case_1_prediction.json
+# Full MECR-RAG pipeline — requires both guideline and past case databases
+# Results are auto-saved to outputs/prediction_results/{case}_{model}_result.json
+python scripts/run_single_case.py scripts/demo_cases/case_1.json --model deepseek
+python scripts/run_single_case.py scripts/demo_cases/case_2.json --model deepseek
 
-# Test with different models - All will show database warnings
+# Test with different models
 python scripts/run_single_case.py scripts/demo_cases/case_3.json --model gpt4o
 python scripts/run_single_case.py scripts/demo_cases/case_4.json --model claude
+
+# Override output path explicitly (optional)
+python scripts/run_single_case.py scripts/demo_cases/case_1.json --model deepseek --output my_result.json
 ```
 
 ### Expected Output
@@ -365,7 +370,7 @@ Our system processes emergency department cases following this structure:
 - **Missing**: `db/past_case/` - Vector databases containing 3,000 medical cases per LLM
 - **Reason**: Patient privacy and ethics requirements
 - **Impact**:
-  - `run_single_case.py` will show warnings about missing databases
+  - `run_single_case.py` will exit with an error if databases are missing
   - `notebooks/03_Generation/RAG (Past Case Only).ipynb` requires past case database
   - `notebooks/03_Generation/RAG (Guideline + Past Case).ipynb` requires past case database
   - Full MECR-RAG pipeline needs user-provided medical case databases
@@ -559,11 +564,11 @@ Once you have your JSON case files ready:
    ```
    db/
    └── past_case/
-       ├── db_{model}_1000case/     # 1K case database
-       ├── db_{model}_2000case/     # 2K case database
-       └── db_{model}_3000case/     # 3K case database
-           ├── summary_vectordb/    # Vector embeddings with metadata
-           ├── json_store/           # Processed cases json files
+       ├── case_vectordb_{model}_1000case/     # 1K case database
+       ├── case_vectordb_{model}_2000case/     # 2K case database
+       └── case_vectordb_{model}_3000case/     # 3K case database
+           ├── summary_vectordb/               # Vector embeddings with metadata
+           └── json_store/                     # Processed case JSON files
    ```
 
 #### Step 3: Test Complete System

@@ -151,7 +151,7 @@ def setup_pipeline(model_type, verbose=False):
             print(f"Expected database: {model_db_name}")
             print(f"Details: {e}")
             print("\nPlease ensure the database files exist in the db/ directory:")
-            print(f"- db/past_case/db_{model_db_name}_3000case/")
+            print(f"- db/past_case/case_vectordb_{model_db_name}_3000case/")
             return None, None, None, None
         except Exception as e:
             print(f"❌ ERROR: Failed to load vector database: {e}")
@@ -282,15 +282,26 @@ def display_results(result, args):
         print(f"  Confidence: {confidence}")
         print("=" * 60)
 
-    # Save or display results
+    # Determine output path — auto-generate if not specified
     if args.output:
-        success = safe_json_save(output_data, args.output)
-        if success:
-            print(f"\nResults saved to: {args.output}")
-        else:
-            print(f"\nError saving results to: {args.output}")
-            return False
+        output_path = args.output
     else:
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        case_stem = os.path.splitext(os.path.basename(args.case_file))[0]
+        output_dir = os.path.join(project_root, settings.DEFAULT_OUTPUT_DIR)
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, f"{case_stem}_{args.model}_result.json")
+
+    # Always save results to file
+    success = safe_json_save(output_data, output_path)
+    if success:
+        print(f"\nResults saved to: {output_path}")
+    else:
+        print(f"\nError saving results to: {output_path}")
+        return False
+
+    # Also print full JSON to console when verbose
+    if args.verbose:
         print("\n" + "=" * 60)
         print("TRIAGE ASSESSMENT RESULTS")
         print("=" * 60)

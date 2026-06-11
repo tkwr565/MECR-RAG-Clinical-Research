@@ -44,8 +44,7 @@ class Settings:
 
     # DeepSeek Configuration
     DEEPSEEK_API_KEY: str = os.getenv("DEEPSEEK_API_KEY")
-    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
-    DEEPSEEK_MODEL_NAME: str = "deepseek-chat"
+    DEEPSEEK_MODEL_NAME: str = "deepseek-v4-pro"
 
     # Anthropic Configuration
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY")
@@ -53,7 +52,7 @@ class Settings:
 
     # Database Paths (relative to project root)
     DB_BASE_DIR: str = "db"
-    TRIAGE_GUIDELINES_PATH: str = "db/triage_sections_with_summaries_deepseekv3.json"
+    TRIAGE_GUIDELINES_PATH: str = "db/triage_sections_with_summaries_deepseek-v4-pro.json"
     PAST_CASE_BASE_DIR: str = "db/past_case"
 
     # Model Configuration
@@ -82,7 +81,7 @@ class Settings:
     @classmethod
     def get_vector_db_path(cls, model: str) -> str:
         """Get the vector database path for a specific model."""
-        return f"{cls.PAST_CASE_BASE_DIR}/db_{model}_3000case"
+        return f"{cls.PAST_CASE_BASE_DIR}/case_vectordb_{model}_3000case"
 
     @classmethod
     def get_case_json_dir(cls, model: str) -> str:
@@ -99,7 +98,7 @@ class Settings:
 settings = Settings()
 
 # Model name mappings for vector database paths
-MODEL_NAMES = {"deepseek": "deepseekv3", "gpt4o": "gpt-4o", "claude": "claude-3-7"}
+MODEL_NAMES = {"deepseek": "deepseek-v4-pro", "gpt4o": "gpt-4o", "claude": "claude-3-7"}
 
 
 def get_model_db_name(model_key: str) -> str:

@@ -6,7 +6,7 @@ based on case summaries and clinical presentations.
 """
 
 from typing import List, Dict, Any
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from ..data.state import GraphState

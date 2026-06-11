@@ -6,58 +6,37 @@ including DeepSeek, Azure OpenAI (GPT-4o), and Anthropic Claude.
 """
 
 from typing import Optional
-from langchain_openai import ChatOpenAI, AzureChatOpenAI
+from langchain_openai import AzureChatOpenAI
 from langchain_anthropic import ChatAnthropic
-
-try:
-    from langchain_deepseek import ChatDeepSeek
-    DEEPSEEK_AVAILABLE = True
-except ImportError:
-    DEEPSEEK_AVAILABLE = False
-    ChatDeepSeek = None
+from langchain_deepseek import ChatDeepSeek
 
 from ..config.settings import settings
 
 
 def initialize_deepseek(
     api_key: Optional[str] = None,
-    base_url: Optional[str] = None,
     model_name: Optional[str] = None,
     temperature: Optional[float] = None,
-    use_native_client: bool = True,
-) -> ChatOpenAI | ChatDeepSeek:
+) -> ChatDeepSeek:
     """
-    Initialize DeepSeek client using LangChain.
+    Initialize DeepSeek client using the native langchain-deepseek client.
 
     Args:
         api_key: DeepSeek API key (defaults to settings)
-        base_url: DeepSeek API base URL (defaults to settings)
         model_name: Model name to use (defaults to settings)
         temperature: Temperature for generation (defaults to settings)
-        use_native_client: If True and available, use ChatDeepSeek instead of ChatOpenAI
 
     Returns:
-        ChatDeepSeek or ChatOpenAI: Initialized DeepSeek client
+        ChatDeepSeek: Initialized DeepSeek client
     """
-    if use_native_client and DEEPSEEK_AVAILABLE:
-        # Use native ChatDeepSeek client for better integration
-        return ChatDeepSeek(
-            model=model_name or settings.DEEPSEEK_MODEL_NAME,
-            api_key=api_key or settings.DEEPSEEK_API_KEY,
-            temperature=(
-                temperature if temperature is not None else settings.DEFAULT_TEMPERATURE
-            ),
-        )
-    else:
-        # Fallback to ChatOpenAI with base_url
-        return ChatOpenAI(
-            model=model_name or settings.DEEPSEEK_MODEL_NAME,
-            api_key=api_key or settings.DEEPSEEK_API_KEY,
-            base_url=base_url or settings.DEEPSEEK_BASE_URL,
-            temperature=(
-                temperature if temperature is not None else settings.DEFAULT_TEMPERATURE
-            ),
-        )
+    return ChatDeepSeek(
+        model=model_name or settings.DEEPSEEK_MODEL_NAME,
+        api_key=api_key or settings.DEEPSEEK_API_KEY,
+        temperature=(
+            temperature if temperature is not None else settings.DEFAULT_TEMPERATURE
+        ),
+        extra_body={"thinking": {"type": "disabled"}},
+    )
 
 
 def initialize_azure_openai(
@@ -125,7 +104,7 @@ def initialize_claude(
 
 def create_llm(
     model_type: str, **kwargs
-) -> ChatOpenAI | AzureChatOpenAI | ChatAnthropic:
+) -> ChatDeepSeek | AzureChatOpenAI | ChatAnthropic:
     """
     Factory function to create an LLM client based on model type.
 
@@ -141,7 +120,7 @@ def create_llm(
     """
     model_type = model_type.lower()
 
-    if model_type in ["deepseek", "deepseekv3"]:
+    if model_type in ["deepseek", "deepseek-v4-pro"]:
         return initialize_deepseek(**kwargs)
     elif model_type in ["gpt4o", "gpt-4o", "azure"]:
         return initialize_azure_openai(**kwargs)
@@ -166,8 +145,8 @@ def get_model_name_for_db(model_type: str) -> str:
     """
     model_type = model_type.lower()
 
-    if model_type in ["deepseek", "deepseekv3"]:
-        return "deepseekv3"
+    if model_type in ["deepseek", "deepseek-v4-pro"]:
+        return "deepseek-v4-pro"
     elif model_type in ["gpt4o", "gpt-4o", "azure"]:
         return "gpt-4o"
     elif model_type in ["claude", "claude-3-7", "anthropic"]:
@@ -185,9 +164,9 @@ def get_available_models() -> dict:
     """
     return {
         "deepseek": {
-            "aliases": ["deepseek", "deepseekv3"],
-            "db_name": "deepseekv3",
-            "description": "DeepSeek-v3 model",
+            "aliases": ["deepseek", "deepseek-v4-pro"],
+            "db_name": "deepseek-v4-pro",
+            "description": "DeepSeek V4 Pro model",
         },
         "gpt4o": {
             "aliases": ["gpt4o", "gpt-4o", "azure"],
