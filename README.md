@@ -3,7 +3,7 @@
 A comprehensive Retrieval-Augmented Generation system for emergency medicine triage decision support, implementing multi-evidence reasoning with clinical guidelines and historical case analysis.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: NC](https://img.shields.io/badge/License-Academic%20NC-red.svg)](LICENSE)
 [![Ethics Approved](https://img.shields.io/badge/Ethics-CIRB%202024--561--4-green.svg)]()
 
 ---
@@ -844,7 +844,7 @@ Submitted for journal review, 2025.
 ```
 MECR-RAG-Clinical-Research/
 ├── README.md                    # This documentation
-├── LICENSE                      # MIT License for code sharing
+├── LICENSE                      # Academic Non-Commercial License
 ├── requirements.txt             # Python dependencies with versions
 ├── .env.template                # Environment configuration template
 ├── .gitignore                   # Privacy protection and cleanup
