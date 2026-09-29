@@ -34,7 +34,7 @@ This repository supports two research publications on retrieval-augmented LLMs f
 
 ### Publication 1: Multi-Evidence Clinical Reasoning System (Published)
 
-**Citation**: Wong HS, Wong TK. Multi-Evidence Clinical Reasoning With Retrieval-Augmented Generation for Emergency Triage: Retrospective Evaluation Study. *JMIR Med Inform* 2025;13:e82026. DOI: [10.2196/82026](https://doi.org/10.2196/82026)
+**Citation**: Wong HS, Wong TK. Multi-Evidence Clinical Reasoning With Retrieval-Augmented Generation for Emergency Triage: Retrospective Evaluation Study. *JMIR Med Inform* 2026;14:e82026. DOI: [10.2196/82026](https://doi.org/10.2196/82026)
 
 **Focus**: Development and validation of the MECR-RAG system for emergency triage category assignment across all acuity levels (Categories 1-5).
 
