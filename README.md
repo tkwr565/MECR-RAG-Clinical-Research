@@ -46,21 +46,21 @@ This repository supports two research publications on retrieval-augmented LLMs f
 
 **Implementation**: Original system with string-based LLM outputs (v1.0)
 
-### Publication 2: Category 3 Deterioration Detection 
+### Publication 2: Category 3 Deterioration Detection (Accepted – Article in Press)
 
-**Authors**: Li CY, Wong TK, Wong HS
+**Citation**: Li CY, Wong TK, Wong HS. Low-burden identification of severe early deterioration among mid-acuity emergency department attendances initially triaged as category 3 using a retrieval-augmented large language model: a retrospective outcome-defined case-control study. *BMC Emergency Medicine*. 2026. DOI: [10.1186/s12873-026-01791-6](https://doi.org/10.1186/s12873-026-01791-6)
 
-**Title**: Low-burden identification of severe early deterioration among Category 3 emergency department attendances using a retrieval-augmented large language model: a retrospective outcome-defined case-control study
+**Status**: Accepted 15 September 2026; published online 24 September 2026 (Article in Press). This version is citable and carries a permanent DOI; the final Version of Record will replace it automatically.
 
 **Focus**: Application of MECR-RAG for identifying severe early deterioration risk specifically in Category 3 (Urgent) ED attendances.
 
 **Key Findings**:
-- Retrieval-augmented model achieved **68.1% sensitivity** at **10% alert burden**
-- Baseline LLM (no retrieval) achieved only 27.8% sensitivity at same burden
-- Multi-evidence retrieval critical for detecting subtle deterioration indicators
-- Demonstrates clinical utility for triaging-within-triage in high-volume urgent cases
+- Retrieval-augmented model achieved **68.1% sensitivity** at **10% endpoint-negative alert burden** (vs 27.8% for the prompt-only baseline)
+- Positive likelihood ratio 7.44 (vs 2.60 for baseline) at the fixed Category ≤2 operational threshold
+- Multi-evidence retrieval critical for low-burden risk enrichment within the mid-acuity stratum
+- Demonstrates selective escalation support rather than broad re-triage of high-volume Category 3 attendances
 
-**Implementation**: Enhanced system with structured Pydantic outputs (v2.0) enabling programmatic extraction of triage categories, confidence scores, and reasoning steps for case-control study analysis.
+**Implementation**: Enhanced system with structured Pydantic outputs (v2.0) enabling programmatic extraction of triage categories, confidence scores, and reasoning steps for the outcome-defined case-control analysis.
 
 ### Repository Version History
 
